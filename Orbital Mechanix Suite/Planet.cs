@@ -20,6 +20,11 @@ namespace Orbital_Mechanix_Suite
         public double semi_Major_Axis;
         public double mean_Anomaly_Epoch;
         public double mass_Planet;
+        public double true_anomaly;
+        public double radius;
+        public  Vector3 heliocentric_coord = new Vector3();
+        private static double d2r = Math.PI / 180;
+        private static double r2d = 180 / Math.PI;
         public Planet()
         {
             name = "default";
@@ -95,6 +100,7 @@ namespace Orbital_Mechanix_Suite
             {
                 theta += 360;
             }
+            true_anomaly = theta;
             return theta;
         }
 
@@ -103,7 +109,21 @@ namespace Orbital_Mechanix_Suite
             double theta = True_anomaly(days);
             theta = theta * Math.PI / 180;
             double rad = (semi_Major_Axis * (1 - Math.Pow(eccentricity, 2))) / (1 + eccentricity * Math.Cos(theta));
+            radius = rad;
             return rad;
+        }
+        public Vector3 Heliocentric(double days)
+        {
+            double v = True_anomaly(days)*d2r;
+            double rad = Radius(days);
+            double o = Long_asc_node*d2r;
+            double p = (Long_asc_node + arg_periapse)*d2r;
+            double i = inclination*d2r;
+            heliocentric_coord = new Vector3();
+            heliocentric_coord.x = rad * (Math.Cos(o) * Math.Cos(v + p - o) - Math.Sin(o) * Math.Sin(v + p - o) * Math.Cos(i));
+            heliocentric_coord.y = rad * (Math.Sin(o) * Math.Cos(v + p - o) + Math.Cos(o) * Math.Sin(v + p - o) *Math.Cos(i));
+            heliocentric_coord.z = rad * (Math.Sin(v + p - o) * Math.Sin(i));
+            return heliocentric_coord;
         }
     }
 }
