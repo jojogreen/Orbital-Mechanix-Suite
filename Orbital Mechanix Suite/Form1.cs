@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using ChartDirector;
 
+
 namespace Orbital_Mechanix_Suite
 {
 
@@ -19,10 +20,12 @@ namespace Orbital_Mechanix_Suite
         public List<Planet> PlanetList = new List<Planet>();
         public List<Vector3> InitVel = new List<Vector3>();
         public List<Vector3> FinalVel = new List<Vector3>();
-        private static double AU2m = 149597870700;
-        public Planet Mercury = new Planet("Mercury", 1.976193311288083E-01, 7.013873298083790, 5.885642355456797E10, 4.812376548400915E1, 2.581669078701001E1, 1.789289550796730E2, 3.302E23);
+        private static double AU2m = 149597870.700E3;
+        public Planet Mercury = new Planet("Mercury", 0.20563593, 7.00497902, 0.38709927*AU2m, 48.33076593, 77.45779628- 48.33076593, 1.789289550796730E2, 3.302E23);
         public Planet Venus = new Planet("Venus", 1.616509607284541E-02, 3.381654228084926, 1.103556808489555E11, 7.663280644582068E+01, 7.454007924054743E+01, 3.063745561693953E+01, 48.685E23);
-        public Planet Earth = new Planet("Earth", 1.539024710796432E-02, 1.179024940726686E-02, 1.489476741134844E11, -1.059863596387948E+01, 6.373464993332024E+01, 2.570514546707050E+01, 5.97219E24);
+        public Planet Earth = new Planet("Earth", 0.01671123, -0.00001531, 1.00000261*AU2m, 0, -102.93768193, 100.46457166 - 102.93768193, 5.97219E24);
+        public Planet Mars = new Planet("Mars", 0.09341233, 1.84969142, 1.52371034 * AU2m, 49.55953891, -23.94362959-49.55953891, -4.55343205+23.94362959, 6.4185E23);
+        public double[] departVel;
         //public Planet Mars = new Planet();
 
         //Get the date and the days from J2000 Epoch from the datePick item
@@ -49,6 +52,7 @@ namespace Orbital_Mechanix_Suite
             PlanetList.Add(Mercury);
             PlanetList.Add(Venus);
             PlanetList.Add(Earth);
+            PlanetList.Add(Mars);
             foreach (Planet plan in PlanetList)
             {
                 comboBox1.Items.Add(plan.name);
@@ -91,31 +95,31 @@ namespace Orbital_Mechanix_Suite
                                     TA = plan1.True_anomaly(daysFromJ2000);
                                     outputBox.AppendText("True Anomaly (deg) = " + TA + "\r\n");
                                     break;
-                                case 2:
+                                case 1:
                                     double Radius = plan1.Radius(daysFromJ2000);
                                     outputBox.AppendText("Radius from Orbiting Body (m) = " + Radius + "\r\n");
                                     break;
-                                case 3:
+                                case 2:
                                     double SemiMajor = plan1.semi_Major_Axis;
                                     outputBox.AppendText("Semi-Major Axis (m) = " + SemiMajor + "\r\n");
                                     break;
-                                case 4:
+                                case 3:
                                     double Eccentr = plan1.eccentricity;
                                     outputBox.AppendText("Eccentricity = " + Eccentr + "\r\n");
                                     break;
-                                case 5:
+                                case 4:
                                     double inc = plan1.inclination;
                                     outputBox.AppendText("Inclination (deg) = " + inc + "\r\n");
                                     break;
-                                case 6:
+                                case 5:
                                     double longAscNode = plan1.Long_asc_node;
                                     outputBox.AppendText("Longitude of Ascending Node (deg)= " + longAscNode + "\r\n");
                                     break;
-                                case 7:
+                                case 6:
                                     double ArgPer = plan1.arg_periapse;
                                     outputBox.AppendText("Argument of Periapse (deg) = " + ArgPer + "\r\n");
                                     break;
-                                case 8:
+                                case 7:
                                     double Mass = plan1.mass_Planet;
                                     outputBox.AppendText("Mass (Kg)" + Mass + "\r\n");
                                     break;
@@ -137,6 +141,72 @@ namespace Orbital_Mechanix_Suite
 
         private void winChartViewer1_MouseEnter(object sender, EventArgs e)
         {
+
+            double[] depart = new double[150];
+            double[] arrive = new double[150];
+            double[] departVel = new double[depart.Length * arrive.Length];
+            string Plan1Name = InitPlanet.Text;
+            string Plan2Name = FinPlanet.Text;
+            Planet Plan1 = PlanetFind(Plan1Name);
+            Planet Plan2 = PlanetFind(Plan2Name);
+
+
+            for (int i = 0; i < depart.Length; i++)
+            {
+                depart[i] = (double)2458800 + i*2;
+                arrive[i] = (double)2458800 + 180 + i*2;
+            }
+            for (int arriveinc = 0; arriveinc < arrive.Length; arriveinc++)
+            {
+                for (int departinc = 0; departinc < depart.Length; departinc++)
+                {
+                    Vector3 Rad1 = new Vector3();
+                    Rad1 = Plan1.Heliocentric(depart[departinc]);
+                    //Rad1 = new Vector3(Rad1.x * 1000, Rad1.y * 1000, Rad1.z * 1000);
+                    Vector3 Rad2 = new Vector3();
+                    Rad2 = Plan2.Heliocentric(arrive[arriveinc]);
+                    //Rad2 = new Vector3(Rad2.x * 1000, Rad2.y * 1000, Rad2.z * 1000);
+                    Vector3 Vel1 = new Vector3();
+                    Vel1 = Lambert.Solver(Rad1, Rad2, arrive[arriveinc]-depart[departinc], "pro", "V1");
+                    double temp = Vel1.Magnitude();
+                    if (temp > (double)40)
+                    {
+                        temp = (double)39;
+                    }
+                    departVel[arriveinc * depart.Length + departinc] = temp;
+      
+                }
+            }
+            int x = 0;
+            // Create a SurfaceChart object of size 380 x 340 pixels, with white (ffffff) background
+            // and grey (888888) border.
+            XYChart c = new XYChart(800,800);
+            c.setPlotArea(75, 40, 600, 600, -1, -1, -1, c.dashLineColor(unchecked((int)0x80000000), Chart.DotLine), -1);
+            // When auto-scaling, use tick spacing of 40 pixels as a guideline
+            c.yAxis().setTickDensity(40);
+            c.xAxis().setTickDensity(40);
+            //c.setPlotRegion(300, 300, 720, 600, 200);
+            // Set the x-axis and y-axis scale
+            // c.xAxis().setLinearScale(2458788, 2458788+100, 10);
+            //c.yAxis().setLinearScale(2458788+150, 2458788+250, 10);
+
+            // Add a contour layer using the given data
+            ContourLayer layer = c.addContourLayer(depart, arrive, departVel);
+            
+            // Move the grid lines in front of the contour layer
+            c.getPlotArea().moveGridBefore(layer);
+            // Add a color axis (the legend) in which the top left corner is anchored at (505, 40).
+            // Set the length to 400 pixels and the labels on the right side.
+            ColorAxis cAxis = layer.setColorAxis(505, 40, Chart.TopLeft, 400, Chart.Right);
+
+            // Add a title to the color axis using 12 points Arial Bold Italic font
+            cAxis.setTitle("Color Legend Title Place Holder", "Arial Bold Italic", 12);
+
+
+            // Output the chart
+            winChartViewer1.Chart = c;
+
+            /*
                         // The data for the bar chart
             double[] data = {85, 156, 179.5, 211, 123};
 
@@ -148,7 +218,7 @@ namespace Orbital_Mechanix_Suite
             c.addBarLayer(data);
             c.xAxis().setLabels(labels);
             winChartViewer1.Chart = c;
-
+            */
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -159,19 +229,15 @@ namespace Orbital_Mechanix_Suite
             string Plan2Name = FinPlanet.Text;
             Planet Plan1 = PlanetFind(Plan1Name);
             Planet Plan2 = PlanetFind(Plan2Name);
-            for (int i = 0; i < 750; i++)
-            {
                 Vector3 Rad1 = new Vector3();
-                Rad1 = Plan1.Heliocentric(0);
+                Rad1 = Plan1.Heliocentric(100);
                 Vector3 Rad2 = new Vector3();
-                Rad2 = Plan2.Heliocentric(i);
+                Rad2 = Plan2.Heliocentric(400);
                 Vector3 Vel1 = new Vector3();
                 Vector3 Vel2 = new Vector3();
                 Vel1 = Lambert.Solver(Rad1, Rad2, 300, "pro", "V1");
-                InitVel.Add(Vel1);
                 Vel2 = Lambert.Solver(Rad1, Rad2, 300, "pro", "V2");
-                FinalVel.Add(Vel2);
-            }
+            /*
             double MinVelI = 99999;
             double MinVelF = 99999;
             foreach (Vector3 vect in InitVel)
@@ -189,9 +255,9 @@ namespace Orbital_Mechanix_Suite
                 {
                     MinVelF = Mag;
                 }
-            }
-            Console.WriteLine(MinVelI);
-            Console.WriteLine(MinVelF);
+            }*/
+           // Console.WriteLine(Vel1.Magnitude());
+            //Console.WriteLine(Vel2.Magnitude());
             int z = 0;
         }
         private Planet PlanetFind(string Name)

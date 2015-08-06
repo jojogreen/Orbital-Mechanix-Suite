@@ -41,10 +41,10 @@
             this.button1 = new System.Windows.Forms.Button();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.FinPlanet = new System.Windows.Forms.ComboBox();
+            this.InitPlanet = new System.Windows.Forms.ComboBox();
             this.button2 = new System.Windows.Forms.Button();
             this.winChartViewer1 = new ChartDirector.WinChartViewer();
-            this.InitPlanet = new System.Windows.Forms.ComboBox();
-            this.FinPlanet = new System.Windows.Forms.ComboBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -53,12 +53,16 @@
             // 
             // tabControl1
             // 
+            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Location = new System.Drawing.Point(7, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(767, 381);
+            this.tabControl1.Size = new System.Drawing.Size(938, 456);
+            this.tabControl1.SizeMode = System.Windows.Forms.TabSizeMode.FillToRight;
             this.tabControl1.TabIndex = 11;
             // 
             // tabPage1
@@ -76,7 +80,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(759, 355);
+            this.tabPage1.Size = new System.Drawing.Size(930, 430);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Orbit Param.";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -193,10 +197,30 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(759, 355);
+            this.tabPage2.Size = new System.Drawing.Size(930, 430);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Delta V";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // FinPlanet
+            // 
+            this.FinPlanet.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.FinPlanet.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.HistoryList;
+            this.FinPlanet.FormattingEnabled = true;
+            this.FinPlanet.Location = new System.Drawing.Point(190, 48);
+            this.FinPlanet.Name = "FinPlanet";
+            this.FinPlanet.Size = new System.Drawing.Size(121, 21);
+            this.FinPlanet.TabIndex = 13;
+            // 
+            // InitPlanet
+            // 
+            this.InitPlanet.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.InitPlanet.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.HistoryList;
+            this.InitPlanet.FormattingEnabled = true;
+            this.InitPlanet.Location = new System.Drawing.Point(18, 48);
+            this.InitPlanet.Name = "InitPlanet";
+            this.InitPlanet.Size = new System.Drawing.Size(121, 21);
+            this.InitPlanet.TabIndex = 12;
             // 
             // button2
             // 
@@ -212,37 +236,17 @@
             // 
             this.winChartViewer1.Location = new System.Drawing.Point(395, 67);
             this.winChartViewer1.Name = "winChartViewer1";
-            this.winChartViewer1.Size = new System.Drawing.Size(300, 200);
+            this.winChartViewer1.Size = new System.Drawing.Size(529, 346);
             this.winChartViewer1.TabIndex = 0;
             this.winChartViewer1.TabStop = false;
             this.winChartViewer1.MouseEnter += new System.EventHandler(this.winChartViewer1_MouseEnter);
-            // 
-            // InitPlanet
-            // 
-            this.InitPlanet.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
-            this.InitPlanet.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.HistoryList;
-            this.InitPlanet.FormattingEnabled = true;
-            this.InitPlanet.Location = new System.Drawing.Point(18, 48);
-            this.InitPlanet.Name = "InitPlanet";
-            this.InitPlanet.Size = new System.Drawing.Size(121, 21);
-            this.InitPlanet.TabIndex = 12;
-            // 
-            // FinPlanet
-            // 
-            this.FinPlanet.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
-            this.FinPlanet.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.HistoryList;
-            this.FinPlanet.FormattingEnabled = true;
-            this.FinPlanet.Location = new System.Drawing.Point(190, 48);
-            this.FinPlanet.Name = "FinPlanet";
-            this.FinPlanet.Size = new System.Drawing.Size(121, 21);
-            this.FinPlanet.TabIndex = 13;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(779, 405);
+            this.ClientSize = new System.Drawing.Size(957, 480);
             this.Controls.Add(this.tabControl1);
             this.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.Name = "Form1";

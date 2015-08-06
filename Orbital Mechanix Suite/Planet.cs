@@ -59,11 +59,11 @@ namespace Orbital_Mechanix_Suite
         {
             double E = 0;
             double EHi = 2 * Math.PI, ELO = 0, Error = 500, minErr = Math.Pow(10, -5);
-            for (int i = 0; Error > minErr || i < 500; i++)
+            for (int i = 0; i < 500; i++)
             {
                 E = (EHi + ELO) / 2;
                 Error = E - eccentricity * Math.Sin(E) - m;
-                if (Error == 0)
+                if (Math.Abs(Error) < minErr)
                 {
                     break;
                 }
@@ -84,9 +84,9 @@ namespace Orbital_Mechanix_Suite
             double G = 6.67E-11;
             double M_sun = 1.989E30;
             //first step is to find "n"
-            double n = Math.Sqrt(G * (M_sun+mass_Planet) / ((Math.Pow(semi_Major_Axis, 3))));
+            double n = Math.Sqrt(G * (M_sun + mass_Planet) / ((Math.Pow(semi_Major_Axis, 3))));
 
-            double Time_sec = days * 3600 * 23.9344699;
+            double Time_sec = days * 86400;
 
             double m = n * Time_sec + mean_Anomaly_Epoch * Math.PI / 180;
             m = m % (2 * Math.PI); //keep within bounds of 

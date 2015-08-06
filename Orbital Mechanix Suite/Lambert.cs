@@ -10,12 +10,16 @@ namespace Orbital_Mechanix_Suite
     {
         private static double r1, r2, A, t;
         private static double mu = 132712440018;
+        private static double d2r = Math.PI / 180;
         public static Vector3 Solver(Vector3 R1,Vector3 R2, double T,string str,string returnVel )
         {
             t = T * 23.9347 * 3600;
+            R1 = new Vector3(R1.x * .001, R1.y * .001, R1.z * .001);
+            R2 = new Vector3(R2.x * .001, R2.y * .001, R2.z * .001);
             r1 = R1.Magnitude();
             r2 = R2.Magnitude();
             Vector3 c12 = VectorMath.cross(R1, R2);
+            double dotprod = VectorMath.dot(R1, R2);
             double theta = Math.Acos(VectorMath.dot(R1, R2) / r1 / r2);
 
             if (str == "pro")
@@ -34,11 +38,11 @@ namespace Orbital_Mechanix_Suite
             }
             A = Math.Sin(theta) * Math.Sqrt(r1 * r2 / (1 - Math.Cos(theta)));
             double Z = -100;
-            while(F(Z)<0d)
+            while(FLessZero(Z))
             {
                 Z = Z + .1;
             }
-            double tol = 1E-7f;
+            double tol = 1E-5f;
             int nmax = 10000;
             double ratio = 2f;
             int n = 0;
@@ -51,6 +55,7 @@ namespace Orbital_Mechanix_Suite
             if (n >= nmax)
             {
                 Console.WriteLine(" number of iterations exceeded");
+                return new Vector3(999, 999, 999);
             }
             double f = 1 - y(Z) / r1;
             double g = A * Math.Sqrt(y(Z) / mu);
@@ -62,7 +67,8 @@ namespace Orbital_Mechanix_Suite
             }
             else
             {
-                return new Vector3(og * (R2.x - f * R1.x), og * (R2.y - f * R1.y), og * (R2.z - f * R1.z)); 
+               Vector3 outVal = new Vector3(og * (R2.x - f * R1.x), og * (R2.y - f * R1.y), og * (R2.z - f * R1.z));
+                return outVal;
             }
             /*
             Vector3 V1 =new Vector3(og*(R2.x-f*R1.x),og*(R2.y-f*R1.y),og*(R2.z-f*R1.z));
@@ -78,9 +84,34 @@ namespace Orbital_Mechanix_Suite
             double dum = r1+r2+A*(z*S(z)-1)/Math.Sqrt(C(z));
             return dum;
         }
+        private static bool FLessZero(double z)
+        {
+            int temp1 = -1;
+            int temp2 = -1;
+            int temp3 = -1;
+            bool dum = false;
+
+            if (y(z) > 0)
+            { temp1 = 1; }
+            if (C(z) > 0) { temp2 = 1; }
+            if (S(z) > 0) { temp3 = 1; }
+            int temporary = temp1 * temp2 * temp3;
+            if (temp1 * temp2 * temp3 < 0)
+            {
+                dum = true;
+            }
+            else
+            {
+                dum = false;
+            }
+            return dum;
+        }
         private static double F(double z)
         {
-            double dum = Math.Pow(y(z)/C(z),3/2)*S(z);
+            double temp1 = y(z);
+            double temp2 = C(z);
+            double dum = temp1 / temp2;
+            dum = Math.Pow(dum,3/2)*S(z);
             dum += A*Math.Sqrt(y(z));
             dum -= Math.Sqrt(mu)*t;
             return dum;

@@ -33,7 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="netchartdir_cp">
-      <HintPath>..\..\..\..\..\Documents\ChartDirector\NetWinCharts\bin\netchartdir_cp.dll</HintPath>
+      <HintPath>..\..\..\ChartDirector\NetWinCharts\bin\netchartdir_cp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
