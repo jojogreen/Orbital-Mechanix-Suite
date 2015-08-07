@@ -142,8 +142,8 @@ namespace Orbital_Mechanix_Suite
         private void winChartViewer1_MouseEnter(object sender, EventArgs e)
         {
 
-            double[] depart = new double[150];
-            double[] arrive = new double[150];
+            double[] depart = new double[100];
+            double[] arrive = new double[100];
             double[] departVel = new double[depart.Length * arrive.Length];
             string Plan1Name = InitPlanet.Text;
             string Plan2Name = FinPlanet.Text;
@@ -153,8 +153,8 @@ namespace Orbital_Mechanix_Suite
 
             for (int i = 0; i < depart.Length; i++)
             {
-                depart[i] = (double)2458800 + i*2;
-                arrive[i] = (double)2458800 + 180 + i*2;
+                depart[i] = (double)2459100 + i*4;
+                arrive[i] = (double)2459180 + i*4;
             }
             for (int arriveinc = 0; arriveinc < arrive.Length; arriveinc++)
             {
@@ -169,12 +169,12 @@ namespace Orbital_Mechanix_Suite
                     Vector3 Vel1 = new Vector3();
                     Vel1 = Lambert.Solver(Rad1, Rad2, arrive[arriveinc]-depart[departinc], "pro", "V1");
                     double temp = Vel1.Magnitude();
-                    if (temp > (double)40)
+                    if (temp > 75)
                     {
-                        temp = (double)39;
+                        temp = (double)75;
                     }
                     departVel[arriveinc * depart.Length + departinc] = temp;
-      
+                    
                 }
             }
             int x = 0;
@@ -222,7 +222,7 @@ namespace Orbital_Mechanix_Suite
         }
 
         private void button2_Click(object sender, EventArgs e)
-        {
+        {/*
             FinalVel.RemoveRange(0, FinalVel.Count);
             InitVel.RemoveRange(0, InitVel.Count);
             string Plan1Name = InitPlanet.Text;
@@ -234,9 +234,11 @@ namespace Orbital_Mechanix_Suite
                 Vector3 Rad2 = new Vector3();
                 Rad2 = Plan2.Heliocentric(400);
                 Vector3 Vel1 = new Vector3();
-                Vector3 Vel2 = new Vector3();
-                Vel1 = Lambert.Solver(Rad1, Rad2, 300, "pro", "V1");
-                Vel2 = Lambert.Solver(Rad1, Rad2, 300, "pro", "V2");
+                Vector3 Vel2 = new Vector3();*/
+            Vector3 Rad1 = new Vector3(1.031501781706124E+08, - 1.117347525618149E+08, - 1.959610305152833E+04);
+            Vector3 Rad2 = new Vector3(-2.461045140392225E+08,  2.469275028176630E+07,  6.542664415034246E+06);
+                Vector3 Vel1 = Lambert.Solver(Rad1, Rad2, 150, "pro", "V1");
+                Vector3 Vel2 = Lambert.Solver(Rad1, Rad2, 150, "pro", "V2");
             /*
             double MinVelI = 99999;
             double MinVelF = 99999;

@@ -125,5 +125,12 @@ namespace Orbital_Mechanix_Suite
             heliocentric_coord.z = rad * (Math.Sin(v + p - o) * Math.Sin(i));
             return heliocentric_coord;
         }
+        public double Velocity(double days)
+        {
+            double R = Radius(days);
+            double mu = 132712440018E9;
+            double Vel = Math.Sqrt(mu * ((2 / R) - (1 / semi_Major_Axis)));
+            return Vel;
+        }
     }
 }
