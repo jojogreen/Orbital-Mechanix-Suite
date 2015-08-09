@@ -23,7 +23,7 @@ namespace Orbital_Mechanix_Suite
         public double true_anomaly;
         public double radius;
         public  Vector3 heliocentric_coord = new Vector3();
-        private static double d2r = Math.PI / 180;
+        private static double d2r = Math.PI / 180d;
         private static double r2d = 180 / Math.PI;
         private double mu = 1.3271284354517480E+11;
         public Planet()
@@ -139,10 +139,13 @@ namespace Orbital_Mechanix_Suite
             double o = Long_asc_node * d2r;
             double w = arg_periapse * d2r;
             double i = inclination * d2r;
-            double R = Radius(days);
+            double R = Radius(days)*.001;
             double v = True_anomaly(days)*d2r;
-            double h = Math.Sqrt(R*.001 * mu * (1 + eccentricity*Math.Cos(v)));
-            Vector3 VelPerifocal = new Vector3((mu / h) * (-Math.Sin(v)), (mu / h) * (eccentricity + Math.Cos(v)), 0);
+            double MU = 132712440018d;
+            // double h = Math.Sqrt(R * MU * (1 + eccentricity*Math.Cos(v)));
+            double h = Math.Sqrt(semi_Major_Axis*.001 * (1d - Math.Pow(eccentricity, 2d)) * MU);
+            double temp = MU / h;
+            Vector3 VelPerifocal = new Vector3((MU / h) * (-Math.Sin(v)), (MU / h) * (eccentricity + Math.Cos(v)), 0d);
             Vector3 VelHelioc = VectorMath.Perifocal2Geocentric(VelPerifocal, o, w, i);
             return VelHelioc;
 

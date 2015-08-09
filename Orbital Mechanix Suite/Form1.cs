@@ -157,7 +157,15 @@ namespace Orbital_Mechanix_Suite
 
         private void winChartViewer1_MouseEnter(object sender, EventArgs e)
         {
+        }
 
+        private void progressBar1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
             double[] depart = new double[100];
             double[] arrive = new double[100];
             double[] departVel = new double[depart.Length * arrive.Length];
@@ -169,61 +177,57 @@ namespace Orbital_Mechanix_Suite
 
             for (int i = 0; i < depart.Length; i++)
             {
-                depart[i] = (double)2458959d + i*5d;
-                arrive[i] = (double)2459139d + i*5d;
+                depart[i] = (double)2458959d + i * 2d;
+                arrive[i] = (double)2459139d + i * 2d;
             }
             for (int arriveinc = 0; arriveinc < arrive.Length; arriveinc++)
             {
                 double ArriveTime = arrive[arriveinc];
-                Vector3 Rad2 = Mars.Heliocentric(ArriveTime - 245145);
+                Vector3 Rad2 = Plan2.Heliocentric(ArriveTime - 2451545);
+                PorkchopProgress.Value = (100*arriveinc)/arrive.Length;
                 for (int departinc = 0; departinc < depart.Length; departinc++)
                 {
                     double departTime = depart[departinc];
                     Vector3 Rad1 = new Vector3();
-                    Rad1 = Earth.Heliocentric(departTime- 2451545);
-                    Vector3 VelPlan1 = Earth.HeliocentricVelocity(departTime - 245145);
+                    Rad1 = Plan1.Heliocentric(departTime - 2451545);
+                    Vector3 VelPlan1 = Plan1.HeliocentricVelocity(departTime - 2451545);
                     Vector3 Vel1 = new Vector3();
                     double temp = 0;
-                    if (ArriveTime - departTime >10)
+                    if (ArriveTime - departTime > 10)
                     {
                         Vel1 = Lambert.Solver(Rad1, Rad2, ArriveTime - departTime, "pro", "V1");
                         Vel1 = new Vector3(Vel1.x - VelPlan1.x, Vel1.y - VelPlan1.y, Vel1.z - VelPlan1.z);
                         temp = Vel1.Magnitude();
                     }
                     departVel[arriveinc * depart.Length + departinc] = temp;
-                    
+
                 }
             }
-            int x = 0;
-            // Create a SurfaceChart object of size 380 x 340 pixels, with white (ffffff) background
-            // and grey (888888) border.
-            XYChart c = new XYChart(800,800);
+            XYChart c = new XYChart(800, 800);
             c.setPlotArea(75, 40, 600, 600, -1, -1, -1, c.dashLineColor(unchecked((int)0x80000000), Chart.DotLine), -1);
             // When auto-scaling, use tick spacing of 40 pixels as a guideline
             c.yAxis().setTickDensity(40);
             c.xAxis().setTickDensity(40);
-            //c.setPlotRegion(300, 300, 720, 600, 200);
-            // Set the x-axis and y-axis scale
-            // c.xAxis().setLinearScale(2458788, 2458788+100, 10);
-            //c.yAxis().setLinearScale(2458788+150, 2458788+250, 10);
+
 
             // Add a contour layer using the given data
             ContourLayer layer = c.addContourLayer(depart, arrive, departVel);
-            
-            // Move the grid lines in front of the contour layer
             c.getPlotArea().moveGridBefore(layer);
-            // Add a color axis (the legend) in which the top left corner is anchored at (505, 40).
-            // Set the length to 400 pixels and the labels on the right side.
-            ColorAxis cAxis = layer.setColorAxis(505, 40, Chart.TopLeft, 400, Chart.Right);
-            cAxis.setColorScale(new double[10]{20d,25d,20d,35d,40d,45d,50d,55d,60d,65d});
-            cAxis.setColorGradient(true, new int[3] { 0x0000ff, 0xffff00, 0xff0000 });
+            ColorAxis cAxis = layer.setColorAxis(700, 40, Chart.TopLeft, 400, Chart.Right);
+            double[] colorScale = { 3, 0x090446, 3.3, 0x16366B, 3.6, 0x236890, 3.9, 0x309AB5, 4.2, 0x53C45A, 4.5, 0x77EF00, 4.8, 0xBBF70F, 5.1, 0xFFFF1E, 5.4, 0xFF8111, 5.7, 0xFF0404 };
+            cAxis.setColorScale(colorScale, 0xffffff, 0xffffff);
+            cAxis.setColorGradient(false);
             // Add a title to the color axis using 12 points Arial Bold Italic font
-            cAxis.setTitle("Color Legend Title Place Holder", "Arial Bold Italic", 12);
-
+            cAxis.setTitle("Departure Velocity (km/s)", "Arial Bold Italic", 12);
+            c.xAxis().setTitle("Departure Date (JDCT)");
+            c.yAxis().setTitle("Arrival Date (JDCT)");
+            c.addTitle("Departure Velocity from " + Plan1Name + " to " + Plan2Name);
+            c.xAxis().setTickLength(10);
+            c.yAxis().setTickLength(10);
 
             // Output the chart
             winChartViewer1.Chart = c;
-
+            PorkchopProgress.Value = 100;
             /*
                         // The data for the bar chart
             double[] data = {85, 156, 179.5, 211, 123};
@@ -237,51 +241,6 @@ namespace Orbital_Mechanix_Suite
             c.xAxis().setLabels(labels);
             winChartViewer1.Chart = c;
             */
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {/*
-            FinalVel.RemoveRange(0, FinalVel.Count);
-            InitVel.RemoveRange(0, InitVel.Count);
-            string Plan1Name = InitPlanet.Text;
-            string Plan2Name = FinPlanet.Text;
-            Planet Plan1 = PlanetFind(Plan1Name);
-            Planet Plan2 = PlanetFind(Plan2Name);
-                Vector3 Rad1 = new Vector3();
-                Rad1 = Plan1.Heliocentric(100);
-                Vector3 Rad2 = new Vector3();
-                Rad2 = Plan2.Heliocentric(400);
-                Vector3 Vel1 = new Vector3();
-                Vector3 Vel2 = new Vector3();*/
-
-            //Vector3 Rad1 = Earth.Heliocentric(2459209 - 245145);
-            //            Vector3 Rad2 = Mars.Heliocentric(2459209+335 - 245145);
-            Vector3 Rad1 = new Vector3(-118452519.94225738, 88190021.984163448, -23.565247703267328);
-            Vector3 Rad2 = new Vector3(4750095.5787751228, -217206146.96045515, -4666790.0880462183);
-                Vector3 Vel1 = Lambert.Solver(Rad1, Rad2, 305, "pro", "V1");
-                Vector3 Vel2 = Lambert.Solver(Rad1, Rad2, 305, "pro", "V2");
-            /*
-            double MinVelI = 99999;
-            double MinVelF = 99999;
-            foreach (Vector3 vect in InitVel)
-            {
-                double Mag = vect.Magnitude();
-                if (Mag < MinVelI)
-                {
-                    MinVelI = Mag;
-                }
-            }
-            foreach (Vector3 vect in FinalVel)
-            {
-                double Mag = vect.Magnitude();
-                if (Mag < MinVelF)
-                {
-                    MinVelF = Mag;
-                }
-            }*/
-           // Console.WriteLine(Vel1.Magnitude());
-            //Console.WriteLine(Vel2.Magnitude());
-            int z = 0;
         }
         private Planet PlanetFind(string Name)
         {

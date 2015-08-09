@@ -45,6 +45,7 @@
             this.InitPlanet = new System.Windows.Forms.ComboBox();
             this.button2 = new System.Windows.Forms.Button();
             this.winChartViewer1 = new ChartDirector.WinChartViewer();
+            this.PorkchopProgress = new System.Windows.Forms.ProgressBar();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -92,6 +93,7 @@
             this.progressBar1.Size = new System.Drawing.Size(100, 23);
             this.progressBar1.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.progressBar1.TabIndex = 20;
+            this.progressBar1.Click += new System.EventHandler(this.progressBar1_Click);
             // 
             // outputBox
             // 
@@ -190,6 +192,7 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.PorkchopProgress);
             this.tabPage2.Controls.Add(this.FinPlanet);
             this.tabPage2.Controls.Add(this.InitPlanet);
             this.tabPage2.Controls.Add(this.button2);
@@ -234,12 +237,21 @@
             // 
             // winChartViewer1
             // 
+            this.winChartViewer1.BackColor = System.Drawing.Color.DimGray;
             this.winChartViewer1.Location = new System.Drawing.Point(395, 67);
             this.winChartViewer1.Name = "winChartViewer1";
             this.winChartViewer1.Size = new System.Drawing.Size(529, 346);
             this.winChartViewer1.TabIndex = 0;
             this.winChartViewer1.TabStop = false;
             this.winChartViewer1.MouseEnter += new System.EventHandler(this.winChartViewer1_MouseEnter);
+            // 
+            // PorkchopProgress
+            // 
+            this.PorkchopProgress.Location = new System.Drawing.Point(107, 314);
+            this.PorkchopProgress.Name = "PorkchopProgress";
+            this.PorkchopProgress.Size = new System.Drawing.Size(100, 23);
+            this.PorkchopProgress.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.PorkchopProgress.TabIndex = 14;
             // 
             // Form1
             // 
@@ -280,7 +292,7 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.ComboBox FinPlanet;
         private System.Windows.Forms.ComboBox InitPlanet;
-
+        private System.Windows.Forms.ProgressBar PorkchopProgress;
     }
 }
 
