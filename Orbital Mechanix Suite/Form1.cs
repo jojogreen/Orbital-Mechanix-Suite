@@ -23,7 +23,7 @@ namespace Orbital_Mechanix_Suite
         private static double AU2m = 149597870.700E3;
         public Planet Mercury = new Planet("Mercury", 0.20563593, 7.00497902, 0.38709927*AU2m, 48.33076593, 77.45779628- 48.33076593, 1.789289550796730E2, 3.302E23);
         public Planet Venus = new Planet("Venus", 1.616509607284541E-02, 3.381654228084926, 1.103556808489555E11, 7.663280644582068E+01, 7.454007924054743E+01, 3.063745561693953E+01, 48.685E23);
-        public Planet Earth = new Planet("Earth", 0.01671123, -0.00001531, 1.00000261*AU2m, 0, -102.93768193, 100.46457166 - 102.93768193, 5.97219E24);
+        public Planet Earth = new Planet("Earth", 0.01671123, -0.00001531, 1.00000261*AU2m, 0, 102.93768193, -2.47311027, 5.97219E24);
         public Planet Mars = new Planet("Mars", 0.09341233, 1.84969142, 1.52371034 * AU2m, 49.55953891, -23.94362959-49.55953891, -4.55343205+23.94362959, 6.4185E23);
         public double[] departVel;
         //public Planet Mars = new Planet();
@@ -35,10 +35,25 @@ namespace Orbital_Mechanix_Suite
             month = datePick.Value.Month;
             year = datePick.Value.Year;
 
+            if (month == 1 || month == 2)
+            {
+                year--;
+                month += 12;
+            }
+            int A = year / 100;
+            int B = A / 4;
+            int C = 2 - A + B;
+            double E = Math.Truncate(365.25 * (year + 4716d));
+            double F = Math.Truncate(30.6001 * (month + 1d));
+            double JDCT =(double) C + day + E + F - 1524;
+            daysFromJ2000 = JDCT - 2451545;
+
+            /*
             int temp1 = (year+(month+9)/12)/4;
             int temp2 = 275*month/9;
 
-            daysFromJ2000 = (double) 367 * year - 7 * temp1 + temp2 + day - 730531.5 +.5;
+            daysFromJ2000 = (double) 367d * year - 7d * temp1 + temp2 + day - 730531.5 +.5;
+            */
             Console.Write(daysFromJ2000);
             
         }
@@ -129,6 +144,7 @@ namespace Orbital_Mechanix_Suite
                                     break;
                             }
                         }
+                    Vector3 hc = Earth.Heliocentric(2457239 - 2451545);
                         progressBar1.Value = 100;
                     }
                 }
@@ -153,25 +169,26 @@ namespace Orbital_Mechanix_Suite
 
             for (int i = 0; i < depart.Length; i++)
             {
-                depart[i] = (double)2459100 + i*4;
-                arrive[i] = (double)2459180 + i*4;
+                depart[i] = (double)2458959d + i*5d;
+                arrive[i] = (double)2459139d + i*5d;
             }
             for (int arriveinc = 0; arriveinc < arrive.Length; arriveinc++)
             {
+                double ArriveTime = arrive[arriveinc];
+                Vector3 Rad2 = Mars.Heliocentric(ArriveTime - 245145);
                 for (int departinc = 0; departinc < depart.Length; departinc++)
                 {
+                    double departTime = depart[departinc];
                     Vector3 Rad1 = new Vector3();
-                    Rad1 = Plan1.Heliocentric(depart[departinc]);
-                    //Rad1 = new Vector3(Rad1.x * 1000, Rad1.y * 1000, Rad1.z * 1000);
-                    Vector3 Rad2 = new Vector3();
-                    Rad2 = Plan2.Heliocentric(arrive[arriveinc]);
-                    //Rad2 = new Vector3(Rad2.x * 1000, Rad2.y * 1000, Rad2.z * 1000);
+                    Rad1 = Earth.Heliocentric(departTime- 2451545);
+                    Vector3 VelPlan1 = Earth.HeliocentricVelocity(departTime - 245145);
                     Vector3 Vel1 = new Vector3();
-                    Vel1 = Lambert.Solver(Rad1, Rad2, arrive[arriveinc]-depart[departinc], "pro", "V1");
-                    double temp = Vel1.Magnitude();
-                    if (temp > 75)
+                    double temp = 0;
+                    if (ArriveTime - departTime >10)
                     {
-                        temp = (double)75;
+                        Vel1 = Lambert.Solver(Rad1, Rad2, ArriveTime - departTime, "pro", "V1");
+                        Vel1 = new Vector3(Vel1.x - VelPlan1.x, Vel1.y - VelPlan1.y, Vel1.z - VelPlan1.z);
+                        temp = Vel1.Magnitude();
                     }
                     departVel[arriveinc * depart.Length + departinc] = temp;
                     
@@ -198,7 +215,8 @@ namespace Orbital_Mechanix_Suite
             // Add a color axis (the legend) in which the top left corner is anchored at (505, 40).
             // Set the length to 400 pixels and the labels on the right side.
             ColorAxis cAxis = layer.setColorAxis(505, 40, Chart.TopLeft, 400, Chart.Right);
-
+            cAxis.setColorScale(new double[10]{20d,25d,20d,35d,40d,45d,50d,55d,60d,65d});
+            cAxis.setColorGradient(true, new int[3] { 0x0000ff, 0xffff00, 0xff0000 });
             // Add a title to the color axis using 12 points Arial Bold Italic font
             cAxis.setTitle("Color Legend Title Place Holder", "Arial Bold Italic", 12);
 
@@ -235,10 +253,13 @@ namespace Orbital_Mechanix_Suite
                 Rad2 = Plan2.Heliocentric(400);
                 Vector3 Vel1 = new Vector3();
                 Vector3 Vel2 = new Vector3();*/
-            Vector3 Rad1 = new Vector3(1.031501781706124E+08, - 1.117347525618149E+08, - 1.959610305152833E+04);
-            Vector3 Rad2 = new Vector3(-2.461045140392225E+08,  2.469275028176630E+07,  6.542664415034246E+06);
-                Vector3 Vel1 = Lambert.Solver(Rad1, Rad2, 150, "pro", "V1");
-                Vector3 Vel2 = Lambert.Solver(Rad1, Rad2, 150, "pro", "V2");
+
+            //Vector3 Rad1 = Earth.Heliocentric(2459209 - 245145);
+            //            Vector3 Rad2 = Mars.Heliocentric(2459209+335 - 245145);
+            Vector3 Rad1 = new Vector3(-118452519.94225738, 88190021.984163448, -23.565247703267328);
+            Vector3 Rad2 = new Vector3(4750095.5787751228, -217206146.96045515, -4666790.0880462183);
+                Vector3 Vel1 = Lambert.Solver(Rad1, Rad2, 305, "pro", "V1");
+                Vector3 Vel2 = Lambert.Solver(Rad1, Rad2, 305, "pro", "V2");
             /*
             double MinVelI = 99999;
             double MinVelF = 99999;

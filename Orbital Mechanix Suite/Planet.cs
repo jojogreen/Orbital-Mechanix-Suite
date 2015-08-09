@@ -25,6 +25,7 @@ namespace Orbital_Mechanix_Suite
         public  Vector3 heliocentric_coord = new Vector3();
         private static double d2r = Math.PI / 180;
         private static double r2d = 180 / Math.PI;
+        private double mu = 1.3271284354517480E+11;
         public Planet()
         {
             name = "default";
@@ -86,19 +87,19 @@ namespace Orbital_Mechanix_Suite
             //first step is to find "n"
             double n = Math.Sqrt(G * (M_sun + mass_Planet) / ((Math.Pow(semi_Major_Axis, 3))));
 
-            double Time_sec = days * 86400;
+            double Time_sec = days * 24d * 3600d;
 
             double m = n * Time_sec + mean_Anomaly_Epoch * Math.PI / 180;
-            m = m % (2 * Math.PI); //keep within bounds of 
+            m = m % (2d * Math.PI); //keep within bounds of 
             double E = Bisection(m);
 
 
-            double theta = 2 * Math.Atan(Math.Sqrt((1 + eccentricity) / (1 - eccentricity)) * Math.Tan(E / 2));
-            theta = theta * 180 / Math.PI;
-            theta = theta % 360;
+            double theta = 2 * Math.Atan(Math.Sqrt((1d + eccentricity) / (1d - eccentricity)) * Math.Tan(E / 2d));
+            theta = theta * 180d / Math.PI;
+            theta = theta % 360d;
             while (theta < 0)
             {
-                theta += 360;
+                theta += 360d;
             }
             true_anomaly = theta;
             return theta;
@@ -107,23 +108,24 @@ namespace Orbital_Mechanix_Suite
         public double Radius(double days)
         {
             double theta = True_anomaly(days);
-            theta = theta * Math.PI / 180;
-            double rad = (semi_Major_Axis * (1 - Math.Pow(eccentricity, 2))) / (1 + eccentricity * Math.Cos(theta));
+            theta = theta * Math.PI / 180d;
+            double rad = (semi_Major_Axis * (1d - Math.Pow(eccentricity, 2d))) / (1d + eccentricity * Math.Cos(theta));
             radius = rad;
             return rad;
         }
         public Vector3 Heliocentric(double days)
         {
             double v = True_anomaly(days)*d2r;
-            double rad = Radius(days);
+            double rad = Radius(days)*.001;
             double o = Long_asc_node*d2r;
-            double p = (Long_asc_node + arg_periapse)*d2r;
+            double w = arg_periapse * d2r;
             double i = inclination*d2r;
-            heliocentric_coord = new Vector3();
-            heliocentric_coord.x = rad * (Math.Cos(o) * Math.Cos(v + p - o) - Math.Sin(o) * Math.Sin(v + p - o) * Math.Cos(i));
-            heliocentric_coord.y = rad * (Math.Sin(o) * Math.Cos(v + p - o) + Math.Cos(o) * Math.Sin(v + p - o) *Math.Cos(i));
-            heliocentric_coord.z = rad * (Math.Sin(v + p - o) * Math.Sin(i));
-            return heliocentric_coord;
+            double temp = (1d + eccentricity * Math.Cos(v)) * mu * rad*.001;
+            double h = Math.Sqrt(temp);
+            double prec = (h*h / mu) * 1d / (2d + eccentricity * Math.Cos(v));
+            Vector3 R = new Vector3(rad * Math.Cos(v), rad * Math.Sin(v), 0);
+            Vector3 HeliocentricRad = VectorMath.Perifocal2Geocentric(R, o, w, i);
+            return HeliocentricRad;
         }
         public double Velocity(double days)
         {
@@ -131,6 +133,19 @@ namespace Orbital_Mechanix_Suite
             double mu = 132712440018E9;
             double Vel = Math.Sqrt(mu * ((2 / R) - (1 / semi_Major_Axis)));
             return Vel;
+        }
+        public Vector3 HeliocentricVelocity(double days)
+        {
+            double o = Long_asc_node * d2r;
+            double w = arg_periapse * d2r;
+            double i = inclination * d2r;
+            double R = Radius(days);
+            double v = True_anomaly(days)*d2r;
+            double h = Math.Sqrt(R*.001 * mu * (1 + eccentricity*Math.Cos(v)));
+            Vector3 VelPerifocal = new Vector3((mu / h) * (-Math.Sin(v)), (mu / h) * (eccentricity + Math.Cos(v)), 0);
+            Vector3 VelHelioc = VectorMath.Perifocal2Geocentric(VelPerifocal, o, w, i);
+            return VelHelioc;
+
         }
     }
 }

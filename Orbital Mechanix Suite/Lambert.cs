@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Numerics;
 
 namespace Orbital_Mechanix_Suite
 {
-    class Lambert
+    public class Lambert
     {
         private static double r1, r2, A, t;
         private static double mu = 132712440018d;
@@ -14,8 +15,8 @@ namespace Orbital_Mechanix_Suite
         public static Vector3 Solver(Vector3 R1,Vector3 R2, double T,string str,string returnVel )
         {
             t = T * 86400d;
-            R1 = new Vector3(R1.x*.001, R1.y*.001, R1.z * .001);
-            R2 = new Vector3(R2.x * .001, R2.y * .001, R2.z * .001);
+            R1 = new Vector3(R1.x, R1.y, R1.z);
+            R2 = new Vector3(R2.x, R2.y, R2.z);
             r1 = R1.Magnitude();
             r2 = R2.Magnitude();
             Vector3 c12 = VectorMath.cross(R1, R2);
@@ -38,9 +39,10 @@ namespace Orbital_Mechanix_Suite
             }
             A = Math.Sin(theta) * Math.Sqrt(r1 * r2 / (1d - Math.Cos(theta)));
             double Z = -100d;
-            while(F(Z)<0)
+            double tempFZ = -1;
+            while(F(Z) <0)
             {
-                Z = Z + .1;
+                Z = Z + .1; 
             }
             double tol = 1E-8d;
             int nmax = 10000;
@@ -50,12 +52,14 @@ namespace Orbital_Mechanix_Suite
             {
                 n++;
                 ratio = F(Z) /dFdz(Z);
+                double fz = F(Z);
+                double dfdz = dFdz(Z);
                 Z = Z - ratio;
             }
             if (n >= nmax)
             {
                 Console.WriteLine(" number of iterations exceeded");
-                return new Vector3(999, 999, 999);
+                //return new Vector3(999, 999, 999);
             }
             double f = 1d - y(Z) / r1;
             double g = A * Math.Sqrt(y(Z) / mu);
@@ -70,18 +74,16 @@ namespace Orbital_Mechanix_Suite
                Vector3 outVal = new Vector3(og * (R2.x - f * R1.x), og * (R2.y - f * R1.y), og * (R2.z - f * R1.z));
                 return outVal;
             }
-            /*
-            Vector3 V1 =new Vector3(og*(R2.x-f*R1.x),og*(R2.y-f*R1.y),og*(R2.z-f*R1.z));
-            
-            Vector3 V2 = new Vector3(og * (gdot * R2.x - R1.x), og * (gdot * R2.y - R1.y), og * (gdot * R2.z - R1.z));
-            Vector3[] Vout = new Vector3[2];
-            Vout[0] = V1;
-            Vout[1] = V2;
-            return Vout;*/
         }
         private static double y(double z)
         {
-            double dum = r1+r2+A*(z*S(z)-1d)/Math.Sqrt(C(z));
+            double tempkjfd = S(z);
+            double dum = r1+r2+A*(z*S(z)-1d)/Complex.Sqrt(C(z)).Real;
+            if (double.IsNaN(dum))
+            {
+                int ss = 0;
+                tempkjfd = S(z);
+            }
             return dum;
         }
         private static double F(double z)
@@ -89,8 +91,17 @@ namespace Orbital_Mechanix_Suite
             double temp1 = y(z);
             double temp2 = C(z);
             double dum = temp1 / temp2;
-            double temp3 = y(z) / C(z);
-            dum = Math.Pow(y(z)/C(z),1.5)*S(z)+A*Math.Sqrt(y(z))-Math.Sqrt(mu)*t;
+            double temp3 = Math.Pow(y(z),1.5) / Math.Pow(C(z),1.5);
+            double temp5 = Math.Pow(temp3, 1.5);
+            double temp4 = Math.Pow(y(z) / C(z), 1.5) * S(z);
+            double temp7 =S(z);
+            Complex tempor = Complex.Pow(y(z) / C(z), 1.5) * S(z) + A * Complex.Sqrt(y(z)) - Complex.Sqrt(mu) * t;
+            dum = tempor.Real;
+            if (double.IsNaN(dum))
+            {
+                int xx = 0;
+            }
+            
         //    dum += A*Math.Sqrt(y(z));
         //    dum -= Math.Sqrt(mu)*t;
             return dum;
@@ -98,15 +109,28 @@ namespace Orbital_Mechanix_Suite
         private static double dFdz(double z)
         {
             double dum;
-            if(z==0)
+            if(z==0d)
             {
                 dum = (Math.Sqrt(2d) / 40d) * Math.Pow(y(0), 1.5)+ (A / 8d) * (Math.Sqrt(y(0d)) + A * Math.Sqrt((.5) / y(0d)));
             }
             else
             {
-                dum = Math.Pow(y(z)/C(z),1.5)*((.5)/z*(C(z) - 1.5*S(z)/C(z))
-                    + 3*(Math.Pow(S(z),2d))/(.25/C(z))) + (A/8d)*(3d*S(z)/C(z)*Math.Sqrt(y(z))
+               double temp1 = y(z);
+                double temp2 = C(z);
+                double temp3 = S(z);
+                double temp5 = y(z) / C(z);
+                double temp4 = ((.5 / z) * (C(z) - 1.5 * S(z) / C(z)) + (.75/C(z)) * (Math.Pow(S(z), 2d)));
+
+                dum = Math.Pow(y(z)/C(z),1.5)*((.5/z)*(C(z) - 1.5*S(z)/C(z))
+                    + (.75/C(z))*(Math.Pow(S(z),2d))) + (A/8d)*(3d*S(z)/C(z)*Math.Sqrt(y(z))
                     + A*Math.Sqrt(C(z)/y(z)));
+                if (double.IsNaN(dum))
+                {
+                    dum = Complex.Pow(y(z) / C(z), 1.5).Real * (((.5) / z) * (C(z) - 1.5 * S(z) / C(z))
+                    + (3/4) * (Complex.Pow(S(z), 2d).Real) / C(z)) + (A / 8d) * (3d * S(z) / C(z) * Complex.Sqrt(y(z)).Real
+                    + A * Complex.Sqrt(C(z) / y(z)).Real);
+
+                }
             }
             return dum;
         }
@@ -135,6 +159,10 @@ namespace Orbital_Mechanix_Suite
             else
             {
                 s = 1d / 6d;
+            }
+            if (double.IsNaN(s))
+            {
+                int ppp = 0;
             }
             return s;
         }

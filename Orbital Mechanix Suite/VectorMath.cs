@@ -76,7 +76,25 @@ namespace Orbital_Mechanix_Suite
             returnVal.z = outrad[3, 1];
             return returnVal;
         }
-        
+        public static Vector3 Perifocal2Geocentric(Vector3 perifocal, double Omega, double w, double i)
+        {
+            double sOmega = Math.Sin(Omega);
+            double cOmega = Math.Cos(Omega);
+            double sw = Math.Sin(w);
+            double cw = Math.Cos(w);
+            double si = Math.Sin(i);
+            double ci = Math.Cos(i);
+            
+            double X = (-sOmega * ci * sw + cOmega * cw) * perifocal.x + (-sOmega * ci * cw - cOmega * sw) * perifocal.y;
+            double Y = (cOmega * ci * sw + sOmega * cw) * perifocal.x + (cOmega * ci * cw - sOmega * sw) * perifocal.y;
+            double Z = si * sw * perifocal.x + si * cw * perifocal.y;
+            /*
+            double X = (-sOmega * ci * sw + cOmega * cw) * perifocal.x + (cOmega * ci * sw + sOmega * sw) * perifocal.y;
+            double Y = (-sOmega * ci * cw - cOmega * sw) * perifocal.x + (cOmega * ci * cw - sOmega * sw) * perifocal.y;
+            double Z = (sOmega * si) * perifocal.x + (-cOmega * si) * perifocal.y;*/
+            return new Vector3(X, Y, Z);
+        }
+
     }
     public class Vector3
     {
@@ -116,6 +134,7 @@ namespace Orbital_Mechanix_Suite
             double[] vect = {x,y,z};
             return vect;
         }
+
     }
 
  
