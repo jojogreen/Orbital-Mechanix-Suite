@@ -70,7 +70,7 @@ namespace Orbital_Mechanix_Suite_Tests
             Vector3 EarthRad = new Vector3(4.440778960961146E+07, - 1.454625135657227E+08,  7.039903338298202E+03);
             Vector3 MarsRad = new Vector3(8.550441288420311E+07, 2.098123095830674E+08, 2.299312316831380E+06);
             double time = 2459219- 2459039;
-            Vector3 Vout = Lambert.Solver(EarthRad, MarsRad, time, "pro", "V1");
+            Vector3 Vout = new Lambert.Solver(EarthRad, MarsRad, time, "pro", "V1");
             double LambertIs = Vout.Magnitude();
             double ShouldBe = 32.9054;
             Assert.AreEqual(LambertIs, ShouldBe, .05);

@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ChartDirector;
+using System.Threading.Tasks;
+using System.Threading;
 
 
 namespace Orbital_Mechanix_Suite
@@ -29,11 +31,11 @@ namespace Orbital_Mechanix_Suite
         //public Planet Mars = new Planet();
 
         //Get the date and the days from J2000 Epoch from the datePick item
-        private void getDate()
+        private double getDate(DateTimePicker temp)
         {
-            day = datePick.Value.Day;
-            month = datePick.Value.Month;
-            year = datePick.Value.Year;
+            day = temp.Value.Day;
+            month = temp.Value.Month;
+            year = temp.Value.Year;
 
             if (month == 1 || month == 2)
             {
@@ -46,7 +48,7 @@ namespace Orbital_Mechanix_Suite
             double E = Math.Truncate(365.25 * (year + 4716d));
             double F = Math.Truncate(30.6001 * (month + 1d));
             double JDCT =(double) C + day + E + F - 1524;
-            daysFromJ2000 = JDCT - 2451545;
+            double deltaJDCT = JDCT - 2451545;
 
             /*
             int temp1 = (year+(month+9)/12)/4;
@@ -55,7 +57,7 @@ namespace Orbital_Mechanix_Suite
             daysFromJ2000 = (double) 367d * year - 7d * temp1 + temp2 + day - 730531.5 +.5;
             */
             Console.Write(daysFromJ2000);
-            
+            return deltaJDCT;
         }
 
         public Form1()
@@ -82,7 +84,7 @@ namespace Orbital_Mechanix_Suite
             string selectedPlanet = comboBox1.Text;
            // float day = (float)day_numeric.Value;
             
-            getDate();
+             daysFromJ2000 = getDate(datePick);
             foreach (Planet plan1 in PlanetList)
                 {
                     if (selectedPlanet == plan1.name)
@@ -173,36 +175,49 @@ namespace Orbital_Mechanix_Suite
             string Plan2Name = FinPlanet.Text;
             Planet Plan1 = PlanetFind(Plan1Name);
             Planet Plan2 = PlanetFind(Plan2Name);
-
-
+            double depDate = getDate(DepartDate);
+            double arrivDate = getDate(ArriveDate);
             for (int i = 0; i < depart.Length; i++)
             {
-                depart[i] = (double)2458959d + i * 2d;
-                arrive[i] = (double)2459139d + i * 2d;
+                depart[i] = (double)depDate+2451545d + i * 2d;
+                arrive[i] = (double)arrivDate+2451545 + i * 2d;
             }
-            for (int arriveinc = 0; arriveinc < arrive.Length; arriveinc++)
-            {
-                double ArriveTime = arrive[arriveinc];
-                Vector3 Rad2 = Plan2.Heliocentric(ArriveTime - 2451545);
-                PorkchopProgress.Value = (100*arriveinc)/arrive.Length;
-                for (int departinc = 0; departinc < depart.Length; departinc++)
-                {
-                    double departTime = depart[departinc];
-                    Vector3 Rad1 = new Vector3();
-                    Rad1 = Plan1.Heliocentric(departTime - 2451545);
-                    Vector3 VelPlan1 = Plan1.HeliocentricVelocity(departTime - 2451545);
-                    Vector3 Vel1 = new Vector3();
-                    double temp = 0;
-                    if (ArriveTime - departTime > 10)
-                    {
-                        Vel1 = Lambert.Solver(Rad1, Rad2, ArriveTime - departTime, "pro", "V1");
-                        Vel1 = new Vector3(Vel1.x - VelPlan1.x, Vel1.y - VelPlan1.y, Vel1.z - VelPlan1.z);
-                        temp = Vel1.Magnitude();
-                    }
-                    departVel[arriveinc * depart.Length + departinc] = temp;
+            departVel = new double[depart.Length * arrive.Length];
+            int DLength = depart.Length;
+            int state = 0;
+            Parallel.For(0, arrive.Length, new ParallelOptions { MaxDegreeOfParallelism = 3 }, arriveinc =>
+             {
+                 double[] Depart = { 0};
 
-                }
-            }
+                     Depart = depart;
+
+                 //Console.WriteLine(arriveinc);
+                 double ArriveTime = arrive[arriveinc];
+                 Vector3 Rad2 = Plan2.Heliocentric(ArriveTime - 2451545);
+
+                 for (int departinc = 0; departinc < DLength; departinc++)
+                 {
+
+                     double temp = 0;
+                     double departTime = Depart[departinc];
+                     Vector3 Rad1 = new Vector3();
+                     Rad1 = Plan1.Heliocentric(departTime - 2451545);
+                     Vector3 VelPlan1 = Plan1.HeliocentricVelocity(departTime - 2451545);
+                     Vector3 Vel1 = new Vector3();
+                     if (ArriveTime - departTime > 10)
+                     {
+                        Lambert L1 = new Lambert();
+                        Vel1 = L1.Solver(Rad1, Rad2, ArriveTime - departTime, "pro", "V1");
+                     }
+                     Vel1 = new Vector3(Vel1.x - VelPlan1.x, Vel1.y - VelPlan1.y, Vel1.z - VelPlan1.z);
+                     temp = Vel1.Magnitude();
+                     lock(departVel)
+                     {
+                         departVel[arriveinc * DLength + departinc] = temp;
+                     }
+                 }
+                 Interlocked.Increment(ref state);
+             });
             XYChart c = new XYChart(800, 800);
             c.setPlotArea(75, 40, 600, 600, -1, -1, -1, c.dashLineColor(unchecked((int)0x80000000), Chart.DotLine), -1);
             // When auto-scaling, use tick spacing of 40 pixels as a guideline
@@ -215,7 +230,7 @@ namespace Orbital_Mechanix_Suite
             c.getPlotArea().moveGridBefore(layer);
             ColorAxis cAxis = layer.setColorAxis(700, 40, Chart.TopLeft, 400, Chart.Right);
             double[] colorScale = { 3, 0x090446, 3.3, 0x16366B, 3.6, 0x236890, 3.9, 0x309AB5, 4.2, 0x53C45A, 4.5, 0x77EF00, 4.8, 0xBBF70F, 5.1, 0xFFFF1E, 5.4, 0xFF8111, 5.7, 0xFF0404 };
-            cAxis.setColorScale(colorScale, 0xffffff, 0xffffff);
+            cAxis.setColorScale(colorScale, 0x090446, 0xffffff);
             cAxis.setColorGradient(false);
             // Add a title to the color axis using 12 points Arial Bold Italic font
             cAxis.setTitle("Departure Velocity (km/s)", "Arial Bold Italic", 12);
@@ -227,7 +242,6 @@ namespace Orbital_Mechanix_Suite
 
             // Output the chart
             winChartViewer1.Chart = c;
-            PorkchopProgress.Value = 100;
             /*
                         // The data for the bar chart
             double[] data = {85, 156, 179.5, 211, 123};

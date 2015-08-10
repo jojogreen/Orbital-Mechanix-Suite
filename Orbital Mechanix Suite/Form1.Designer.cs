@@ -45,7 +45,10 @@
             this.InitPlanet = new System.Windows.Forms.ComboBox();
             this.button2 = new System.Windows.Forms.Button();
             this.winChartViewer1 = new ChartDirector.WinChartViewer();
-            this.PorkchopProgress = new System.Windows.Forms.ProgressBar();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.DepartDate = new System.Windows.Forms.DateTimePicker();
+            this.ArriveDate = new System.Windows.Forms.DateTimePicker();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -62,7 +65,7 @@
             this.tabControl1.Location = new System.Drawing.Point(7, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(938, 456);
+            this.tabControl1.Size = new System.Drawing.Size(1425, 619);
             this.tabControl1.SizeMode = System.Windows.Forms.TabSizeMode.FillToRight;
             this.tabControl1.TabIndex = 11;
             // 
@@ -192,7 +195,10 @@
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.PorkchopProgress);
+            this.tabPage2.Controls.Add(this.ArriveDate);
+            this.tabPage2.Controls.Add(this.DepartDate);
+            this.tabPage2.Controls.Add(this.label6);
+            this.tabPage2.Controls.Add(this.label5);
             this.tabPage2.Controls.Add(this.FinPlanet);
             this.tabPage2.Controls.Add(this.InitPlanet);
             this.tabPage2.Controls.Add(this.button2);
@@ -200,7 +206,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(930, 430);
+            this.tabPage2.Size = new System.Drawing.Size(1417, 593);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Delta V";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -210,7 +216,7 @@
             this.FinPlanet.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this.FinPlanet.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.HistoryList;
             this.FinPlanet.FormattingEnabled = true;
-            this.FinPlanet.Location = new System.Drawing.Point(190, 48);
+            this.FinPlanet.Location = new System.Drawing.Point(331, 48);
             this.FinPlanet.Name = "FinPlanet";
             this.FinPlanet.Size = new System.Drawing.Size(121, 21);
             this.FinPlanet.TabIndex = 13;
@@ -238,27 +244,53 @@
             // winChartViewer1
             // 
             this.winChartViewer1.BackColor = System.Drawing.Color.DimGray;
-            this.winChartViewer1.Location = new System.Drawing.Point(395, 67);
+            this.winChartViewer1.Location = new System.Drawing.Point(587, 123);
             this.winChartViewer1.Name = "winChartViewer1";
             this.winChartViewer1.Size = new System.Drawing.Size(529, 346);
             this.winChartViewer1.TabIndex = 0;
             this.winChartViewer1.TabStop = false;
             this.winChartViewer1.MouseEnter += new System.EventHandler(this.winChartViewer1_MouseEnter);
             // 
-            // PorkchopProgress
+            // label5
             // 
-            this.PorkchopProgress.Location = new System.Drawing.Point(107, 314);
-            this.PorkchopProgress.Name = "PorkchopProgress";
-            this.PorkchopProgress.Size = new System.Drawing.Size(100, 23);
-            this.PorkchopProgress.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
-            this.PorkchopProgress.TabIndex = 14;
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.Location = new System.Drawing.Point(14, 25);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(146, 20);
+            this.label5.TabIndex = 17;
+            this.label5.Text = "Departure Planet";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label6.Location = new System.Drawing.Point(335, 25);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(117, 20);
+            this.label6.TabIndex = 18;
+            this.label6.Text = "Target Planet";
+            // 
+            // DepartDate
+            // 
+            this.DepartDate.Location = new System.Drawing.Point(6, 75);
+            this.DepartDate.Name = "DepartDate";
+            this.DepartDate.Size = new System.Drawing.Size(200, 20);
+            this.DepartDate.TabIndex = 19;
+            // 
+            // ArriveDate
+            // 
+            this.ArriveDate.Location = new System.Drawing.Point(289, 75);
+            this.ArriveDate.Name = "ArriveDate";
+            this.ArriveDate.Size = new System.Drawing.Size(200, 20);
+            this.ArriveDate.TabIndex = 20;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(957, 480);
+            this.ClientSize = new System.Drawing.Size(1444, 643);
             this.Controls.Add(this.tabControl1);
             this.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.Name = "Form1";
@@ -268,6 +300,7 @@
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
             this.tabPage2.ResumeLayout(false);
+            this.tabPage2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.winChartViewer1)).EndInit();
             this.ResumeLayout(false);
 
@@ -292,7 +325,10 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.ComboBox FinPlanet;
         private System.Windows.Forms.ComboBox InitPlanet;
-        private System.Windows.Forms.ProgressBar PorkchopProgress;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.DateTimePicker ArriveDate;
+        private System.Windows.Forms.DateTimePicker DepartDate;
     }
 }
 

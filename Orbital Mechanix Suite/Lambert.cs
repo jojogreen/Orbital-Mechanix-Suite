@@ -9,73 +9,73 @@ namespace Orbital_Mechanix_Suite
 {
     public class Lambert
     {
-        private static double r1, r2, A, t;
+        private double r1, r2, A, t;
         private static double mu = 132712440018d;
         private static double d2r = Math.PI / 180d;
-        public static Vector3 Solver(Vector3 R1,Vector3 R2, double T,string str,string returnVel )
+        public Vector3 Solver(Vector3 R1,Vector3 R2, double T,string str,string returnVel )
         {
-            t = T * 86400d;
-            R1 = new Vector3(R1.x, R1.y, R1.z);
-            R2 = new Vector3(R2.x, R2.y, R2.z);
-            r1 = R1.Magnitude();
-            r2 = R2.Magnitude();
-            Vector3 c12 = VectorMath.cross(R1, R2);
-            double dotprod = VectorMath.dot(R1, R2);
-            double theta = Math.Acos(VectorMath.dot(R1, R2) / r1 / r2);
+                t = T * 86400d;
+                R1 = new Vector3(R1.x, R1.y, R1.z);
+                R2 = new Vector3(R2.x, R2.y, R2.z);
+                r1 = R1.Magnitude();
+                r2 = R2.Magnitude();
+                Vector3 c12 = VectorMath.cross(R1, R2);
+                double dotprod = VectorMath.dot(R1, R2);
+                double theta = Math.Acos(VectorMath.dot(R1, R2) / r1 / r2);
 
-            if (str == "pro")
-            {
-                if (c12.z<=0)
+                if (str == "pro")
                 {
-                    theta = 2d * Math.PI - theta;
+                    if (c12.z <= 0)
+                    {
+                        theta = 2d * Math.PI - theta;
+                    }
                 }
-            }
-            else if(str =="retro")
-            {
-                if(c12.z>=0)
+                else if (str == "retro")
                 {
-                    theta = 2d * Math.PI - theta;
+                    if (c12.z >= 0)
+                    {
+                        theta = 2d * Math.PI - theta;
+                    }
                 }
-            }
-            A = Math.Sin(theta) * Math.Sqrt(r1 * r2 / (1d - Math.Cos(theta)));
-            double Z = -100d;
-            double tempFZ = -1;
-            while(F(Z) <0)
-            {
-                Z = Z + .1; 
-            }
-            double tol = 1E-8d;
-            int nmax = 10000;
-            double ratio = 2d;
-            int n = 0;
-            while (Math.Abs(ratio) > tol && n <= nmax)
-            {
-                n++;
-                ratio = F(Z) /dFdz(Z);
-                double fz = F(Z);
-                double dfdz = dFdz(Z);
-                Z = Z - ratio;
-            }
-            if (n >= nmax)
-            {
-                Console.WriteLine(" number of iterations exceeded");
-                //return new Vector3(999, 999, 999);
-            }
-            double f = 1d - y(Z) / r1;
-            double g = A * Math.Sqrt(y(Z) / mu);
-            double gdot = 1d - y(Z) / r2;
-            double og = 1d/g;
-            if (returnVel == "V2")
-            {
-                return new Vector3(og * (gdot * R2.x - R1.x), og * (gdot * R2.y - R1.y), og * (gdot * R2.z - R1.z));
-            }
-            else
-            {
-               Vector3 outVal = new Vector3(og * (R2.x - f * R1.x), og * (R2.y - f * R1.y), og * (R2.z - f * R1.z));
-                return outVal;
-            }
+                A = Math.Sin(theta) * Math.Sqrt(r1 * r2 / (1d - Math.Cos(theta)));
+                double Z = -100d;
+                double tempFZ = -1;
+                while (F(Z) < 0)
+                {
+                    Z = Z + .1;
+                }
+                double tol = 1E-8d;
+                int nmax = 10000;
+                double ratio = 2d;
+                int n = 0;
+                while (Math.Abs(ratio) > tol && n <= nmax)
+                {
+                    n++;
+                    ratio = F(Z) / dFdz(Z);
+                    double fz = F(Z);
+                    double dfdz = dFdz(Z);
+                    Z = Z - ratio;
+                }
+                if (n >= nmax)
+                {
+                    Console.WriteLine(" number of iterations exceeded");
+                    //return new Vector3(999, 999, 999);
+                }
+                double f = 1d - y(Z) / r1;
+                double g = A * Math.Sqrt(y(Z) / mu);
+                double gdot = 1d - y(Z) / r2;
+                double og = 1d / g;
+                if (returnVel == "V2")
+                {
+                    return new Vector3(og * (gdot * R2.x - R1.x), og * (gdot * R2.y - R1.y), og * (gdot * R2.z - R1.z));
+                }
+                else
+                {
+                    Vector3 outVal = new Vector3(og * (R2.x - f * R1.x), og * (R2.y - f * R1.y), og * (R2.z - f * R1.z));
+                    return outVal;
+                }
         }
-        private static double y(double z)
+        private double y(double z)
         {
             double tempkjfd = S(z);
             double dum = r1+r2+A*(z*S(z)-1d)/Complex.Sqrt(C(z)).Real;
@@ -86,7 +86,7 @@ namespace Orbital_Mechanix_Suite
             }
             return dum;
         }
-        private static double F(double z)
+        private double F(double z)
         {
             double temp1 = y(z);
             double temp2 = C(z);
@@ -106,7 +106,7 @@ namespace Orbital_Mechanix_Suite
         //    dum -= Math.Sqrt(mu)*t;
             return dum;
         }
-        private static double dFdz(double z)
+        private double dFdz(double z)
         {
             double dum;
             if(z==0d)
@@ -134,18 +134,18 @@ namespace Orbital_Mechanix_Suite
             }
             return dum;
         }
-        private static double C(double z)
+        private double C(double z)
         {
             double dum = stumpC(z);
             return dum;
         }
-        private static double S(double z)
+        private double S(double z)
         {
             double dum = stumpS(z);
             return dum;
         }
 
-        private static double stumpS(double z)
+        private double stumpS(double z)
         {
             double s;
             if(z>0d)
@@ -166,7 +166,7 @@ namespace Orbital_Mechanix_Suite
             }
             return s;
         }
-        private static double stumpC(double z)
+        private double stumpC(double z)
         {
             double c;
             if(z>0d)
