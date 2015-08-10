@@ -166,58 +166,16 @@ namespace Orbital_Mechanix_Suite
 
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void UpdatePlot(object sender, RunWorkerCompletedEventArgs e)
         {
-            double[] depart = new double[100];
-            double[] arrive = new double[100];
-            double[] departVel = new double[depart.Length * arrive.Length];
-            string Plan1Name = InitPlanet.Text;
-            string Plan2Name = FinPlanet.Text;
-            Planet Plan1 = PlanetFind(Plan1Name);
-            Planet Plan2 = PlanetFind(Plan2Name);
-            double depDate = getDate(DepartDate);
-            double arrivDate = getDate(ArriveDate);
-            for (int i = 0; i < depart.Length; i++)
-            {
-                depart[i] = (double)depDate+2451545d + i * 2d;
-                arrive[i] = (double)arrivDate+2451545 + i * 2d;
-            }
-            departVel = new double[depart.Length * arrive.Length];
-            int DLength = depart.Length;
-            int state = 0;
-            Parallel.For(0, arrive.Length, new ParallelOptions { MaxDegreeOfParallelism = 3 }, arriveinc =>
-             {
-                 double[] Depart = { 0};
+            List<object> objlist = new List<object>();
+            objlist.AddRange((List<object>)e.Result);
+            double[] depart = (double[])objlist[0];
+            double[] arrive = (double[])objlist[1];
+            double[] departVel = (double[])objlist[2];
+            string Plan1Name = (string)objlist[3];
+            string Plan2Name = (string)objlist[4];
 
-                     Depart = depart;
-
-                 //Console.WriteLine(arriveinc);
-                 double ArriveTime = arrive[arriveinc];
-                 Vector3 Rad2 = Plan2.Heliocentric(ArriveTime - 2451545);
-
-                 for (int departinc = 0; departinc < DLength; departinc++)
-                 {
-
-                     double temp = 0;
-                     double departTime = Depart[departinc];
-                     Vector3 Rad1 = new Vector3();
-                     Rad1 = Plan1.Heliocentric(departTime - 2451545);
-                     Vector3 VelPlan1 = Plan1.HeliocentricVelocity(departTime - 2451545);
-                     Vector3 Vel1 = new Vector3();
-                     if (ArriveTime - departTime > 10)
-                     {
-                        Lambert L1 = new Lambert();
-                        Vel1 = L1.Solver(Rad1, Rad2, ArriveTime - departTime, "pro", "V1");
-                     }
-                     Vel1 = new Vector3(Vel1.x - VelPlan1.x, Vel1.y - VelPlan1.y, Vel1.z - VelPlan1.z);
-                     temp = Vel1.Magnitude();
-                     lock(departVel)
-                     {
-                         departVel[arriveinc * DLength + departinc] = temp;
-                     }
-                 }
-                 Interlocked.Increment(ref state);
-             });
             XYChart c = new XYChart(800, 800);
             c.setPlotArea(75, 40, 600, 600, -1, -1, -1, c.dashLineColor(unchecked((int)0x80000000), Chart.DotLine), -1);
             // When auto-scaling, use tick spacing of 40 pixels as a guideline
@@ -242,6 +200,7 @@ namespace Orbital_Mechanix_Suite
 
             // Output the chart
             winChartViewer1.Chart = c;
+
             /*
                         // The data for the bar chart
             double[] data = {85, 156, 179.5, 211, 123};
@@ -255,6 +214,95 @@ namespace Orbital_Mechanix_Suite
             c.xAxis().setLabels(labels);
             winChartViewer1.Chart = c;
             */
+
+        }
+
+        private void RunPorkchop(object sender, DoWorkEventArgs e)
+        {
+            List<object> objlist = e.Argument as List<object>;
+            double[] depart =(double[]) objlist[0];
+            double[] arrive =(double[]) objlist[1];
+            double[] departVel = (double[])objlist[2];
+            string Plan1Name = (string)objlist[3];
+            string Plan2Name = (string)objlist[4];
+            Planet Plan1 = (Planet)objlist[5];
+            Planet Plan2 = (Planet)objlist[6];
+            int DLength = depart.Length;
+            int state = 0;
+            Parallel.For(0, arrive.Length, new ParallelOptions { MaxDegreeOfParallelism = 3 }, arriveinc =>
+            {
+
+                double[] Depart = { 0 };
+
+                Depart = depart;
+
+                //Console.WriteLine(arriveinc);
+                double ArriveTime = arrive[arriveinc];
+                Vector3 Rad2 = Plan2.Heliocentric(ArriveTime - 2451545);
+
+                for (int departinc = 0; departinc < DLength; departinc++)
+                {
+
+                    double temp = 0;
+                    double departTime = Depart[departinc];
+                    Vector3 Rad1 = new Vector3();
+                    Rad1 = Plan1.Heliocentric(departTime - 2451545);
+                    Vector3 VelPlan1 = Plan1.HeliocentricVelocity(departTime - 2451545);
+                    Vector3 Vel1 = new Vector3();
+                    if (ArriveTime - departTime > 10)
+                    {
+                        Lambert L1 = new Lambert();
+                        Vel1 = L1.Solver(Rad1, Rad2, ArriveTime - departTime, "pro", "V1");
+                    }
+                    Vel1 = new Vector3(Vel1.x - VelPlan1.x, Vel1.y - VelPlan1.y, Vel1.z - VelPlan1.z);
+                    temp = Vel1.Magnitude();
+                    lock (departVel)
+                    {
+                        departVel[arriveinc * DLength + departinc] = temp;
+                    }
+                }
+                Interlocked.Increment(ref state);
+            }
+             );
+            List<object> resultList = new List<object>();
+            resultList.Add(depart);
+            resultList.Add(arrive);
+            resultList.Add(departVel);
+            resultList.Add(Plan1Name);
+            resultList.Add(Plan2Name);
+            e.Result = resultList;
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            double[] depart = new double[100];
+            double[] arrive = new double[100];
+            double[] departVel = new double[depart.Length * arrive.Length];
+            string Plan1Name = "Earth";
+            string Plan2Name = "Mars";
+            Plan1Name = InitPlanet.Text;
+            Plan2Name = FinPlanet.Text;
+            Planet Plan1 = PlanetFind(Plan1Name);
+            Planet Plan2 = PlanetFind(Plan2Name);
+            double depDate = getDate(DepartDate);
+            double arrivDate = getDate(ArriveDate);
+            for (int i = 0; i < depart.Length; i++)
+            {
+                depart[i] = (double)depDate + 2451545d + i * 2d;
+                arrive[i] = (double)arrivDate + 2451545 + i * 2d;
+            }
+            departVel = new double[depart.Length * arrive.Length];
+            List<object> argumentlist = new List<object>();
+            argumentlist.Add(depart);
+            argumentlist.Add(arrive);
+            argumentlist.Add(departVel);
+            argumentlist.Add(Plan1Name);
+            argumentlist.Add(Plan2Name);
+            argumentlist.Add(Plan1);
+            argumentlist.Add(Plan2);
+            backgroundWorker1.RunWorkerAsync(argumentlist);
+  
         }
         private Planet PlanetFind(string Name)
         {

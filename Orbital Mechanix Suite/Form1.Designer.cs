@@ -41,14 +41,15 @@
             this.button1 = new System.Windows.Forms.Button();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.ArriveDate = new System.Windows.Forms.DateTimePicker();
+            this.DepartDate = new System.Windows.Forms.DateTimePicker();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
             this.FinPlanet = new System.Windows.Forms.ComboBox();
             this.InitPlanet = new System.Windows.Forms.ComboBox();
             this.button2 = new System.Windows.Forms.Button();
             this.winChartViewer1 = new ChartDirector.WinChartViewer();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.DepartDate = new System.Windows.Forms.DateTimePicker();
-            this.ArriveDate = new System.Windows.Forms.DateTimePicker();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -84,7 +85,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(930, 430);
+            this.tabPage1.Size = new System.Drawing.Size(1417, 593);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Orbit Param.";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -211,6 +212,40 @@
             this.tabPage2.Text = "Delta V";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // ArriveDate
+            // 
+            this.ArriveDate.Location = new System.Drawing.Point(289, 75);
+            this.ArriveDate.Name = "ArriveDate";
+            this.ArriveDate.Size = new System.Drawing.Size(200, 20);
+            this.ArriveDate.TabIndex = 20;
+            // 
+            // DepartDate
+            // 
+            this.DepartDate.Location = new System.Drawing.Point(6, 75);
+            this.DepartDate.Name = "DepartDate";
+            this.DepartDate.Size = new System.Drawing.Size(200, 20);
+            this.DepartDate.TabIndex = 19;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label6.Location = new System.Drawing.Point(335, 25);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(117, 20);
+            this.label6.TabIndex = 18;
+            this.label6.Text = "Target Planet";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.Location = new System.Drawing.Point(14, 25);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(146, 20);
+            this.label5.TabIndex = 17;
+            this.label5.Text = "Departure Planet";
+            // 
             // FinPlanet
             // 
             this.FinPlanet.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
@@ -251,39 +286,10 @@
             this.winChartViewer1.TabStop = false;
             this.winChartViewer1.MouseEnter += new System.EventHandler(this.winChartViewer1_MouseEnter);
             // 
-            // label5
+            // backgroundWorker1
             // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(14, 25);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(146, 20);
-            this.label5.TabIndex = 17;
-            this.label5.Text = "Departure Planet";
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.Location = new System.Drawing.Point(335, 25);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(117, 20);
-            this.label6.TabIndex = 18;
-            this.label6.Text = "Target Planet";
-            // 
-            // DepartDate
-            // 
-            this.DepartDate.Location = new System.Drawing.Point(6, 75);
-            this.DepartDate.Name = "DepartDate";
-            this.DepartDate.Size = new System.Drawing.Size(200, 20);
-            this.DepartDate.TabIndex = 19;
-            // 
-            // ArriveDate
-            // 
-            this.ArriveDate.Location = new System.Drawing.Point(289, 75);
-            this.ArriveDate.Name = "ArriveDate";
-            this.ArriveDate.Size = new System.Drawing.Size(200, 20);
-            this.ArriveDate.TabIndex = 20;
+            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.RunPorkchop);
+            this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.UpdatePlot);
             // 
             // Form1
             // 
@@ -329,6 +335,7 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.DateTimePicker ArriveDate;
         private System.Windows.Forms.DateTimePicker DepartDate;
+        public System.ComponentModel.BackgroundWorker backgroundWorker1;
     }
 }
 
