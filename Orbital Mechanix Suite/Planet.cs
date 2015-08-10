@@ -142,7 +142,6 @@ namespace Orbital_Mechanix_Suite
             double R = Radius(days)*.001;
             double v = True_anomaly(days)*d2r;
             double MU = 132712440018d;
-            // double h = Math.Sqrt(R * MU * (1 + eccentricity*Math.Cos(v)));
             double h = Math.Sqrt(semi_Major_Axis*.001 * (1d - Math.Pow(eccentricity, 2d)) * MU);
             double temp = MU / h;
             Vector3 VelPerifocal = new Vector3((MU / h) * (-Math.Sin(v)), (MU / h) * (eccentricity + Math.Cos(v)), 0d);

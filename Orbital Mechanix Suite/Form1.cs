@@ -23,10 +23,15 @@ namespace Orbital_Mechanix_Suite
         public List<Vector3> InitVel = new List<Vector3>();
         public List<Vector3> FinalVel = new List<Vector3>();
         private static double AU2m = 149597870.700E3;
-        public Planet Mercury = new Planet("Mercury", 0.20563593, 7.00497902, 0.38709927*AU2m, 48.33076593, 77.45779628- 48.33076593, 1.789289550796730E2, 3.302E23);
-        public Planet Venus = new Planet("Venus", 1.616509607284541E-02, 3.381654228084926, 1.103556808489555E11, 7.663280644582068E+01, 7.454007924054743E+01, 3.063745561693953E+01, 48.685E23);
+        public Planet Mercury = new Planet("Mercury", 0.20563593, 7.00497902, 0.38709927 *AU2m, 48.33076593, 77.45779628- 48.33076593, 252.25032350-77.45779628, 3.302E23);
+        public Planet Venus = new Planet("Venus", 0.00677672, 3.39467605, 0.72333566*AU2m, 76.67984255, 131.60246718-76.67984255, 181.97909950-131.60246718, 48.685E23);
         public Planet Earth = new Planet("Earth", 0.01671123, -0.00001531, 1.00000261*AU2m, 0, 102.93768193, -2.47311027, 5.97219E24);
         public Planet Mars = new Planet("Mars", 0.09341233, 1.84969142, 1.52371034 * AU2m, 49.55953891, -23.94362959-49.55953891, -4.55343205+23.94362959, 6.4185E23);
+        public Planet Jupiter = new Planet("Jupiter", 0.04838624, 1.30439695, 5.20288700 * AU2m, 100.47390909, 14.72847983 - 100.47390909, 34.39644051 - 14.72847983, 1.8986E27);
+        public Planet Saturn = new Planet("Saturn", 0.05386179, 2.48599187, 9.53667594 * AU2m, 113.66242448, 92.59887831 - 113.66242448, 49.95424423 - 92.59887831, 5.6846E26);
+        public Planet Uranus = new Planet("Uranus", 0.04725744, 0.77263783, 19.18916464 * AU2m, 74.01692503, 170.95427630 - 74.01692503, 313.23810451 - 170.95427630, 8.6810E25);
+        public Planet Neptune = new Planet("Neptune", 0.00859048, 1.77004347, 30.06992276 * AU2m, 131.78422574, 44.96476227 - 131.78422574, -55.12002969 - 44.96476227, 1.0243E26);
+        public Planet Pluto = new Planet("Pluto", 0.24882730, 17.14001206, 39.48211675 * AU2m, 110.30393684, 224.06891629 - 110.30393684, 238.92903833 - 224.06891629, 1.305E22);
         public double[] departVel;
         //public Planet Mars = new Planet();
 
@@ -70,6 +75,11 @@ namespace Orbital_Mechanix_Suite
             PlanetList.Add(Venus);
             PlanetList.Add(Earth);
             PlanetList.Add(Mars);
+            PlanetList.Add(Jupiter);
+            PlanetList.Add(Saturn);
+            PlanetList.Add(Uranus);
+            PlanetList.Add(Neptune);
+            PlanetList.Add(Pluto);
             foreach (Planet plan in PlanetList)
             {
                 comboBox1.Items.Add(plan.name);
@@ -231,7 +241,6 @@ namespace Orbital_Mechanix_Suite
             int state = 0;
             Parallel.For(0, arrive.Length, new ParallelOptions { MaxDegreeOfParallelism = 3 }, arriveinc =>
             {
-
                 double[] Depart = { 0 };
 
                 Depart = depart;
@@ -254,6 +263,7 @@ namespace Orbital_Mechanix_Suite
                         Lambert L1 = new Lambert();
                         Vel1 = L1.Solver(Rad1, Rad2, ArriveTime - departTime, "pro", "V1");
                     }
+                    else { Vel1 = new Vector3(999, 999, 999); }
                     Vel1 = new Vector3(Vel1.x - VelPlan1.x, Vel1.y - VelPlan1.y, Vel1.z - VelPlan1.z);
                     temp = Vel1.Magnitude();
                     lock (departVel)
@@ -301,8 +311,10 @@ namespace Orbital_Mechanix_Suite
             argumentlist.Add(Plan2Name);
             argumentlist.Add(Plan1);
             argumentlist.Add(Plan2);
-            backgroundWorker1.RunWorkerAsync(argumentlist);
-  
+            if (!backgroundWorker1.IsBusy)
+            {
+                backgroundWorker1.RunWorkerAsync(argumentlist);
+            }
         }
         private Planet PlanetFind(string Name)
         {

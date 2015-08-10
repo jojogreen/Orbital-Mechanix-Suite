@@ -218,6 +218,7 @@
             this.ArriveDate.Name = "ArriveDate";
             this.ArriveDate.Size = new System.Drawing.Size(200, 20);
             this.ArriveDate.TabIndex = 20;
+            this.ArriveDate.Value = new System.DateTime(2020, 10, 17, 0, 0, 0, 0);
             // 
             // DepartDate
             // 
@@ -225,6 +226,7 @@
             this.DepartDate.Name = "DepartDate";
             this.DepartDate.Size = new System.Drawing.Size(200, 20);
             this.DepartDate.TabIndex = 19;
+            this.DepartDate.Value = new System.DateTime(2020, 4, 20, 0, 0, 0, 0);
             // 
             // label6
             // 
@@ -268,26 +270,27 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(117, 253);
+            this.button2.Location = new System.Drawing.Point(167, 133);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.Size = new System.Drawing.Size(141, 23);
             this.button2.TabIndex = 1;
-            this.button2.Text = "button2";
+            this.button2.Text = "Create Porkchop Plot";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // winChartViewer1
             // 
             this.winChartViewer1.BackColor = System.Drawing.Color.DimGray;
-            this.winChartViewer1.Location = new System.Drawing.Point(587, 123);
+            this.winChartViewer1.Location = new System.Drawing.Point(587, 75);
             this.winChartViewer1.Name = "winChartViewer1";
-            this.winChartViewer1.Size = new System.Drawing.Size(529, 346);
+            this.winChartViewer1.Size = new System.Drawing.Size(743, 429);
             this.winChartViewer1.TabIndex = 0;
             this.winChartViewer1.TabStop = false;
             this.winChartViewer1.MouseEnter += new System.EventHandler(this.winChartViewer1_MouseEnter);
             // 
             // backgroundWorker1
             // 
+            this.backgroundWorker1.WorkerSupportsCancellation = true;
             this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.RunPorkchop);
             this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.UpdatePlot);
             // 
