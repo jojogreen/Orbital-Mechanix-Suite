@@ -286,7 +286,7 @@
             this.winChartViewer1.Size = new System.Drawing.Size(743, 429);
             this.winChartViewer1.TabIndex = 0;
             this.winChartViewer1.TabStop = false;
-            this.winChartViewer1.MouseEnter += new System.EventHandler(this.winChartViewer1_MouseEnter);
+            this.winChartViewer1.MouseMoveChart += new System.Windows.Forms.MouseEventHandler(this.winChartViewer1_Move);
             // 
             // backgroundWorker1
             // 
