@@ -316,7 +316,7 @@ namespace Orbital_Mechanix_Suite
 
         private void winChartViewer1_Move(object sender, MouseEventArgs e)
         {
-            Console.WriteLine("Mouse is moving");
+            //Console.WriteLine("Mouse is moving");
             WinChartViewer viewer = (WinChartViewer)sender;
             crossHair((XYChart)viewer.Chart, viewer.PlotAreaMouseX, viewer.PlotAreaMouseY);
             viewer.updateDisplay();
