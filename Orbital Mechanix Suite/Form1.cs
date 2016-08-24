@@ -33,6 +33,8 @@ namespace Orbital_Mechanix_Suite
         public Planet Neptune = new Planet("Neptune", 0.00859048, 1.77004347, 30.06992276 * AU2m, 131.78422574, 44.96476227 - 131.78422574, -55.12002969 - 44.96476227, 1.0243E26);
         public Planet Pluto = new Planet("Pluto", 0.24882730, 17.14001206, 39.48211675 * AU2m, 110.30393684, 224.06891629 - 110.30393684, 238.92903833 - 224.06891629, 1.305E22);
         public double[] departVel;
+        public double[] depart;
+        public double[] arrive;
         //public Planet Mars = new Planet();
 
         //Get the date and the days from J2000 Epoch from the datePick item
@@ -176,11 +178,12 @@ namespace Orbital_Mechanix_Suite
         {
             List<object> objlist = new List<object>();
             objlist.AddRange((List<object>)e.Result);
-            double[] depart = (double[])objlist[0];
-            double[] arrive = (double[])objlist[1];
-            double[] departVel = (double[])objlist[2];
+            depart = (double[])objlist[0];
+            arrive = (double[])objlist[1];
+            departVel = (double[])objlist[2];
             string Plan1Name = (string)objlist[3];
             string Plan2Name = (string)objlist[4];
+
 
             XYChart c = new XYChart(800, 800);
             c.setPlotArea(75, 40, 600, 600, -1, -1, -1, c.dashLineColor(unchecked((int)0x80000000), Chart.DotLine), -1);
@@ -236,6 +239,7 @@ namespace Orbital_Mechanix_Suite
             Planet Plan2 = (Planet)objlist[6];
             int DLength = depart.Length;
             int state = 0;
+            
             Parallel.For(0, arrive.Length, new ParallelOptions { MaxDegreeOfParallelism = 3 }, arriveinc =>
             {
                 double[] Depart = { 0 };
@@ -281,49 +285,7 @@ namespace Orbital_Mechanix_Suite
 
         }
 
-        private void winChartViewer1_MouseMovePlotArea(object sender, MouseEventArgs e)
-        {
-
-        }
-        //
-        // Draw the track line with legend
-        //
-        private void crossHair(XYChart c, int mouseX, int mouseY)
-        {
-            //System.Threading.Thread.Sleep(500);
-            // Clear the current dynamic layer and get the DrawArea object to draw on it.
-            DrawArea d = c.initDynamicLayer();
-
-            // The plot area object
-            PlotArea plotArea = c.getPlotArea();
-
-            // Draw a vertical line and a horizontal line as the cross hair
-            d.vline(plotArea.getTopY(), plotArea.getBottomY(), mouseX, d.dashLineColor(0x000000, 0x0101));
-            d.hline(plotArea.getLeftX(), plotArea.getRightX(), mouseY, d.dashLineColor(0x000000, 0x0101));
-
-            // Draw y-axis label
-            string label = "<*block,bgColor=FFFFDD,margin=3,edgeColor=000000*>" + c.formatValue(c.getYValue(
-                mouseY, c.yAxis()), "{value|P4}") + "<*/*>";
-            TTFText t = d.text(label, "Arial Bold", 8);
-            t.draw(plotArea.getLeftX() - 5, mouseY, 0x000000, Chart.Right);
-
-            // Draw x-axis label
-            label = "<*block,bgColor=FFFFDD,margin=3,edgeColor=000000*>" + c.formatValue(c.getXValue(mouseX),
-                "{value|P4}") + "<*/*>";
-            t = d.text(label, "Arial Bold", 8);
-            t.draw(mouseX, plotArea.getBottomY() + 5, 0x000000, Chart.Top);
-        }
-
-        private void winChartViewer1_Move(object sender, MouseEventArgs e)
-        {
-            //Console.WriteLine("Mouse is moving");
-            WinChartViewer viewer = (WinChartViewer)sender;
-            crossHair((XYChart)viewer.Chart, viewer.PlotAreaMouseX, viewer.PlotAreaMouseY);
-            viewer.updateDisplay();
-
-            // Hide the track cursor when the mouse leaves the plot area
-            viewer.removeDynamicLayer("MouseLeavePlotArea");
-        }
+        
 
         private void button2_Click(object sender, EventArgs e)
         {
@@ -370,6 +332,5 @@ namespace Orbital_Mechanix_Suite
             }
             return PlanetOut;
         }
-
     }
     }
